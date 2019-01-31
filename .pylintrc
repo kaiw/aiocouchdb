@@ -1,10 +1,7 @@
 [MASTER]
 ignore=
        # tests quality need to be fixed one day...
-       tests,
-       # pylint fails for multipart.py with
-       # AttributeError: 'Starred' object has no attribute 'assigned_stmts'
-       multipart.py
+       tests
 jobs=1
 persistent=yes
 profile=no

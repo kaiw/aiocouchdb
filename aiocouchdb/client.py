@@ -26,7 +26,7 @@ from .hdrs import (
     METH_GET,
     URI,
 )
-from .multipart import MultipartWriter
+from aiohttp.multipart import MultipartWriter
 
 
 __all__ = (
