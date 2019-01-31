@@ -24,8 +24,6 @@ from .hdrs import (
     CONTENT_TYPE,
     LOCATION,
     METH_GET,
-    SEC_WEBSOCKET_KEY1,
-    TRANSFER_ENCODING,
     URI,
 )
 from .multipart import MultipartWriter
@@ -39,52 +37,6 @@ __all__ = (
     'extract_credentials',
     'urljoin'
 )
-
-
-# FIXME: workaround of decompressing empty payload.
-# https://github.com/KeepSafe/aiohttp/pull/154
-class HttpPayloadParser(aiohttp.HttpPayloadParser):
-
-    def __call__(self, out, buf):
-        # payload params
-        length = self.message.headers.get(CONTENT_LENGTH, self.length)
-        if SEC_WEBSOCKET_KEY1 in self.message.headers:
-            length = 8
-
-        # payload decompression wrapper
-        if self.compression and self.message.compression:
-            if self.response_with_body:  # the fix
-                out = aiohttp.protocol.DeflateBuffer(out,
-                                                     self.message.compression)
-
-        # payload parser
-        if not self.response_with_body:
-            # don't parse payload if it's not expected to be received
-            pass
-
-        elif 'chunked' in self.message.headers.get(TRANSFER_ENCODING, ''):
-            yield from self.parse_chunked_payload(out, buf)
-
-        elif length is not None:
-            try:
-                length = int(length)
-            except ValueError:
-                raise aiohttp.errors.InvalidHeader(CONTENT_LENGTH) from None
-
-            if length < 0:
-                raise aiohttp.errors.InvalidHeader(CONTENT_LENGTH)
-            elif length > 0:
-                yield from self.parse_length_payload(out, buf, length)
-        else:
-            if self.readall and getattr(self.message, 'code', 0) != 204:
-                yield from self.parse_eof_payload(out, buf)
-            elif getattr(self.message, 'method', None) in ('PUT', 'POST'):
-                aiohttp.log.internal_logger.warning(  # pragma: no cover
-                    'Content-Length or Transfer-Encoding header is required')
-
-        out.feed_eof()
-
-aiohttp.HttpPayloadParser = HttpPayloadParser
 
 
 @asyncio.coroutine
