@@ -36,13 +36,13 @@ setup(
     name='aiocouchdb',
     version=mod.__version__,
     license='BSD',
-    url='https://github.com/kxepal/aiocouchdb',
+    url='https://github.com/kaiw/aiocouchdb',
 
     description='CouchDB client built on top of aiohttp (asyncio)',
     long_description=long_description,
 
-    author='Alexander Shorin',
-    author_email='kxepal@gmail.com',
+    author='Alexander Shorin, Kai Willadsen',
+    author_email='kai.willadsen@gmail.com',
 
     classifiers=[
         'Development Status :: 4 - Beta',
