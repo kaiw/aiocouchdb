@@ -7,9 +7,7 @@
 # you should have received as part of this distribution.
 #
 
-# flake8: noqa
-
-from aiohttp.hdrs import *
+from aiohttp.hdrs import *  # noqa
 from multidict import upstr
 
 #: Defines CouchDB Proxy Auth username
