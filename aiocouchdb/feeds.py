@@ -42,8 +42,8 @@ class Feed(object):
         self._resp = resp
 
         ctype = resp.headers.get(CONTENT_TYPE, '').lower()
-        *_, params = parse_mimetype(ctype)
-        self._encoding = params.get('charset', 'utf-8')  # pylint: disable=E1101
+        mimetype = parse_mimetype(ctype)
+        self._encoding = mimetype.parameters.get('charset', 'utf-8')  # pylint: disable=E1101
 
         asyncio.Task(self._loop(), loop=loop)
 
