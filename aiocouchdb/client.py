@@ -181,7 +181,7 @@ class HttpResponse(aiohttp.ClientResponse):
     @asyncio.coroutine
     def read(self):
         """Read response payload."""
-        if self._content is None:
+        if self._body is None:
             data = bytearray()
             try:
                 while not self.content.at_eof():
@@ -192,20 +192,20 @@ class HttpResponse(aiohttp.ClientResponse):
             else:
                 self.close()
 
-            self._content = data
+            self._body = data
 
-        return self._content
+        return self._body
 
     @asyncio.coroutine
     def json(self, *, encoding='utf-8', loads=json.loads):
         """Reads and decodes JSON response."""
-        if self._content is None:
+        if self._body is None:
             yield from self.read()
 
-        if not self._content.strip():
+        if not self._body.strip():
             return None
 
-        return loads(self._content.decode(encoding))
+        return loads(self._body.decode(encoding))
 
 
 class HttpSession(object):
