@@ -51,7 +51,7 @@ class Feed(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close(force=True if exc_type else False)
+        self.close()
 
     @asyncio.coroutine
     def _loop(self):
@@ -65,7 +65,7 @@ class Feed(object):
                 yield from self._queue.put(chunk)
         except Exception as exc:
             self._exc = exc
-            self.close(True)
+            self.close()
         else:
             self.close()
 
@@ -94,16 +94,12 @@ class Feed(object):
         """
         return self._active or not self._queue.empty()
 
-    def close(self, force=False):
+    def close(self):
         """Closes feed and the related request connection. Closing feed doesnt
         means that all
-
-        :param bool force: In case of True, close connection instead of release.
-                           See :meth:`aiohttp.client.ClientResponse.close` for
-                           the details
         """
         self._active = False
-        self._resp.close(force=force)
+        self._resp.close()
         # put stop signal into queue to break waiting loop on queue.get()
         self._queue.put_nowait(None)
 

@@ -95,7 +95,7 @@ class FeedTestCase(utils.TestCase):
             yield from feed.next()
 
         self.assertFalse(feed.is_active())
-        resp.close.assert_called_with(force=True)
+        resp.close.assert_called()
 
     def test_buffer_workflow(self):
         resp = self.prepare_response(data=[

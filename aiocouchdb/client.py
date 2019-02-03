@@ -95,7 +95,7 @@ def request(method, url, *,
         if allow_redirects and resp.status in {301, 302, 303, 307}:
             redirects += 1
             if max_redirects and redirects >= max_redirects:
-                resp.close(force=True)
+                resp.close()
                 break
 
             # For 301 and 302, mimic IE behaviour, now changed in RFC.
@@ -109,7 +109,7 @@ def request(method, url, *,
 
             scheme = urllib.parse.urlsplit(r_url)[0]
             if scheme not in ('http', 'https', ''):
-                resp.close(force=True)
+                resp.close()
                 raise ValueError('Can redirect only to http or https')
             elif not scheme:
                 r_url = urllib.parse.urljoin(url, r_url)
@@ -171,7 +171,7 @@ class HttpResponse(aiohttp.ClientResponse):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close(force=True if exc_type else False)
+        self.close()
 
     def maybe_raise_error(self):
         """Raises an :exc:`HttpErrorException` if response status code is
@@ -187,7 +187,7 @@ class HttpResponse(aiohttp.ClientResponse):
                 while not self.content.at_eof():
                     data.extend((yield from self.content.read()))
             except:
-                self.close(True)
+                self.close()
                 raise
             else:
                 self.close()
