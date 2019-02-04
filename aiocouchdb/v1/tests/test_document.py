@@ -18,7 +18,7 @@ import aiocouchdb.v1.document
 from . import utils
 
 
-class Stream(object):
+class Stream:
 
     def __init__(self, content):
         self.content = io.BytesIO(content)
@@ -30,6 +30,12 @@ class Stream(object):
     @asyncio.coroutine
     def readline(self):
         return self.content.readline()
+
+    def at_eof(self):
+        return self.content.tell() == len(self.content.getbuffer())
+
+    def unread_data(self, data):
+        self.content = io.BytesIO(data + self.content.read())
 
 
 class DocumentTestCase(utils.DocumentTestCase):
