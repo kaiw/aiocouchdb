@@ -307,7 +307,11 @@ class Document(object):
             boundary = str(uuid.uuid4())
             headers = dict(resp.headers.items())
             headers[CONTENT_TYPE] = 'multipart/related;boundary=%s' % boundary
-            resp.headers = CIMultiDict(**headers)
+            # FIXME: This is a hack around aiohttp's Extremely Cool and Good
+            # @reify (seriously) hack. It's not reliable, it's not
+            # sustainable, and neither the previous code nor this fixes the
+            # raw headers to match.
+            resp._cache['headers'] = CIMultiDict(**headers)
             resp.content._buffer.extend(
                 b'--' + boundary.encode('latin1') + b'\r\n'
                 b'Content-Type: application/json\r\n'
