@@ -19,6 +19,7 @@ import unittest.mock as mock
 import uuid as _uuid
 from collections import deque, defaultdict
 
+from aiohttp.helpers import TimerNoop
 from yarl import URL
 
 import aiocouchdb.client
@@ -129,10 +130,19 @@ class TestCase(unittest.TestCase, metaclass=MetaAioTestCase):
             chunks_queue = deque([data])
             lines_queue = deque(data.splitlines(keepends=True))
 
-        resp = aiocouchdb.client.HttpResponse('', '')
-        resp._post_init(self.loop)
+        resp = aiocouchdb.client.HttpResponse(
+            'get',
+            URL('http://localhost/whatever'),
+            request_info=mock.Mock(),
+            writer=mock.Mock(),
+            continue100=None,
+            timer=TimerNoop(),
+            traces=[],
+            loop=self.loop,
+            session=mock.Mock(),
+        )
         resp.status = status
-        resp.headers = headers
+        resp._headers = headers
         resp.cookies = cookies
         resp.content = unittest.mock.Mock()
         resp.content._buffer = bytearray()
