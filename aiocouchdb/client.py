@@ -15,6 +15,8 @@ import json
 import types
 import urllib.parse
 
+import yarl
+
 from .authn import AuthProvider, NoAuthProvider
 from .errors import maybe_raise_error
 from .hdrs import (
@@ -449,6 +451,14 @@ def urljoin(base, *path):
         ...
     TypeError: argument 2 to map() must support iteration
     """
+    if isinstance(base, yarl.URL):
+        if not path:
+            return base
+        for p in path:
+            segment = urllib.parse.quote(p, '')
+            base = base / segment
+        return base
+
     base = base.rstrip('/')
     if not path:
         return base

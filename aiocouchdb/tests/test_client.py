@@ -67,13 +67,13 @@ class ResourceTestCase(utils.TestCase):
         res = aiocouchdb.client.Resource(self.url)
         new_res = res('foo', 'bar/baz')
         self.assertIsNot(res, new_res)
-        self.assertEqual('http://localhost:5984/foo/bar%2Fbaz', new_res.url)
+        self.assertEqual('http://localhost:5984/foo/bar%2Fbaz', str(new_res.url))
 
     def test_empty_call(self):
         res = aiocouchdb.client.Resource(self.url)
         new_res = res()
         self.assertIsNot(res, new_res)
-        self.assertEqual('http://localhost:5984', new_res.url)
+        self.assertEqual('http://localhost:5984', str(new_res.url))
 
     def test_request_with_path(self):
         res = aiocouchdb.client.Resource(self.url)

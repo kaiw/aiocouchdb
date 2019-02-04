@@ -19,6 +19,8 @@ import unittest.mock as mock
 import uuid as _uuid
 from collections import deque, defaultdict
 
+from yarl import URL
+
 import aiocouchdb.client
 import aiocouchdb.errors
 from aiocouchdb.client import urljoin, extract_credentials
@@ -50,7 +52,7 @@ class TestCase(unittest.TestCase, metaclass=MetaAioTestCase):
 
     _test_target = TARGET
     timeout = 10
-    url = 'http://localhost:5984'
+    url = URL('http://localhost:5984')
 
     def setUp(self):
         self.loop = asyncio.new_event_loop()
