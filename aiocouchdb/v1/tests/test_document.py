@@ -87,7 +87,7 @@ class DocumentTestCase(utils.DocumentTestCase):
     def test_modified(self):
         result = yield from self.doc.modified('1-ABC')
         self.assert_request_called_with('HEAD', *self.request_path(),
-                                        headers={'IF-NONE-MATCH': '"1-ABC"'})
+                                        headers={'If-None-Match': '"1-ABC"'})
         self.assertTrue(result)
 
     def test_not_modified(self):
@@ -95,7 +95,7 @@ class DocumentTestCase(utils.DocumentTestCase):
             result = yield from self.doc.modified(self.rev)
             self.assert_request_called_with(
                 'HEAD', *self.request_path(),
-                headers={'IF-NONE-MATCH': '"%s"' % self.rev})
+                headers={'If-None-Match': '"%s"' % self.rev})
         self.assertFalse(result)
 
     def test_attachment(self):
@@ -124,7 +124,7 @@ class DocumentTestCase(utils.DocumentTestCase):
         self.assertIsInstance(att, self.doc.attachment_class)
 
     def test_rev(self):
-        with self.response(headers={'ETAG': '"%s"' % self.rev}):
+        with self.response(headers={'Etag': '"%s"' % self.rev}):
             result = yield from self.doc.rev()
             self.assert_request_called_with('HEAD', *self.request_path())
         self.assertEqual(self.rev, result)
@@ -162,12 +162,12 @@ class DocumentTestCase(utils.DocumentTestCase):
 
     def test_get_open_revs(self):
         with self.response(headers={
-            'CONTENT-TYPE': 'multipart/mixed;boundary=:'
+            'Content-Type': 'multipart/mixed;boundary=:'
         }):
             result = yield from self.doc.get_open_revs()
             self.assert_request_called_with(
                 'GET', *self.request_path(),
-                headers={'ACCEPT': 'multipart/mixed'},
+                headers={'Accept': 'multipart/mixed'},
                 params={'open_revs': 'all'})
         self.assertIsInstance(
             result,
@@ -179,12 +179,12 @@ class DocumentTestCase(utils.DocumentTestCase):
 
     def test_get_open_revs_list(self):
         with self.response(headers={
-            'CONTENT-TYPE': 'multipart/mixed;boundary=:'
+            'Content-Type': 'multipart/mixed;boundary=:'
         }):
             revs = yield from self.doc.get_open_revs('1-ABC', '2-CDE')
             self.assert_request_called_with(
                 'GET', *self.request_path(),
-                headers={'ACCEPT': 'multipart/mixed'},
+                headers={'Accept': 'multipart/mixed'},
                 params={'open_revs': '["1-ABC", "2-CDE"]'})
             yield from revs.release()
 
@@ -199,7 +199,7 @@ class DocumentTestCase(utils.DocumentTestCase):
 
         for key, value in all_params.items():
             with self.response(headers={
-                'CONTENT-TYPE': 'multipart/mixed;boundary=:'
+                'Content-Type': 'multipart/mixed;boundary=:'
             }):
                 revs = yield from self.doc.get_open_revs(**{key: value})
 
@@ -208,7 +208,7 @@ class DocumentTestCase(utils.DocumentTestCase):
 
                 self.assert_request_called_with(
                     'GET', *self.request_path(),
-                    headers={'ACCEPT': 'multipart/mixed'},
+                    headers={'Accept': 'multipart/mixed'},
                     params={key: value,
                             'open_revs': 'all'})
 
@@ -216,12 +216,12 @@ class DocumentTestCase(utils.DocumentTestCase):
 
     def test_get_with_atts(self):
         with self.response(
-            headers={'CONTENT-TYPE': 'multipart/related;boundary=:'}
+            headers={'Content-Type': 'multipart/related;boundary=:'}
         ):
             result = yield from self.doc.get_with_atts()
             self.assert_request_called_with(
                 'GET', *self.request_path(),
-                headers={'ACCEPT': 'multipart/related, application/json'},
+                headers={'Accept': 'multipart/related, application/json'},
                 params={'attachments': True})
         self.assertIsInstance(
             result,
@@ -233,12 +233,12 @@ class DocumentTestCase(utils.DocumentTestCase):
 
     def test_get_with_atts_json(self):
         with self.response(headers={
-            'CONTENT-TYPE': 'application/json'
+            'Content-Type': 'application/json'
         }):
             result = yield from self.doc.get_with_atts()
             self.assert_request_called_with(
                 'GET', *self.request_path(),
-                headers={'ACCEPT': 'multipart/related, application/json'},
+                headers={'Accept': 'multipart/related, application/json'},
                 params={'attachments': True})
         self.assertIsInstance(
             result,
@@ -254,17 +254,17 @@ class DocumentTestCase(utils.DocumentTestCase):
 
         with self.response(
             data=jsondoc,
-            headers={'CONTENT-TYPE': 'application/json'}
+            headers={'Content-Type': 'application/json'}
         ):
             result = yield from self.doc.get_with_atts()
             self.assert_request_called_with(
                 'GET', *self.request_path(),
-                headers={'ACCEPT': 'multipart/related, application/json'},
+                headers={'Accept': 'multipart/related, application/json'},
                 params={'attachments': True})
 
         resp = result.resp
         self.assertTrue(
-            resp.headers['CONTENT-TYPE'].startswith('multipart/related'))
+            resp.headers['Content-Type'].startswith('multipart/related'))
 
         head, *body, tail = resp.content._buffer.splitlines()
         self.assertTrue(tail.startswith(head))
@@ -288,7 +288,7 @@ class DocumentTestCase(utils.DocumentTestCase):
 
         for key, value in all_params.items():
             with self.response(headers={
-                'CONTENT-TYPE': 'multipart/related;boundary=:'
+                'Content-Type': 'multipart/related;boundary=:'
             }):
                 revs = yield from self.doc.get_with_atts(**{key: value})
 
@@ -297,7 +297,7 @@ class DocumentTestCase(utils.DocumentTestCase):
 
                 self.assert_request_called_with(
                     'GET', *self.request_path(),
-                    headers={'ACCEPT': 'multipart/related, application/json'},
+                    headers={'Accept': 'multipart/related, application/json'},
                     params={key: value, 'attachments': True})
 
                 yield from revs.release()
@@ -429,19 +429,19 @@ class DocumentTestCase(utils.DocumentTestCase):
         newid = utils.uuid()
         yield from self.doc.copy(newid)
         self.assert_request_called_with('COPY', *self.request_path(),
-                                        headers={'DESTINATION': newid})
+                                        headers={'Destination': newid})
 
     def test_copy_rev(self):
         yield from self.doc.copy('idx', '1-A')
         self.assert_request_called_with('COPY', *self.request_path(),
-                                        headers={'DESTINATION': 'idx?rev=1-A'})
+                                        headers={'Destination': 'idx?rev=1-A'})
 
 
 class OpenRevsMultipartReader(utils.TestCase):
 
     def test_next(self):
         reader = aiocouchdb.v1.document.OpenRevsMultipartReader(
-            {'CONTENT-TYPE': 'multipart/mixed;boundary=:'},
+            {'Content-Type': 'multipart/mixed;boundary=:'},
             Stream(b'--:\r\n'
                    b'Content-Type: multipart/related;boundary=--:--\r\n'
                    b'\r\n'
@@ -487,7 +487,7 @@ class OpenRevsMultipartReader(utils.TestCase):
 
     def test_next_only_doc(self):
         reader = aiocouchdb.v1.document.OpenRevsMultipartReader(
-            {'CONTENT-TYPE': 'multipart/mixed;boundary=:'},
+            {'Content-Type': 'multipart/mixed;boundary=:'},
             Stream(b'--:\r\n'
                    b'Content-Type: application/json\r\n'
                    b'\r\n'

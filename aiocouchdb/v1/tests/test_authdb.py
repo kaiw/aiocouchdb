@@ -64,7 +64,7 @@ class UserDocumentTestCase(utils.ServerTestCase):
     def teardown_document(self):
         if not (yield from self.doc.exists()):
             return
-        with self.response(headers={'ETAG': '"1-ABC"'}):
+        with self.response(headers={'Etag': '"1-ABC"'}):
             rev = yield from self.doc.rev()
         yield from self.doc.delete(rev)
 

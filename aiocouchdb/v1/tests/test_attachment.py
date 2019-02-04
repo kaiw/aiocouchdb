@@ -76,7 +76,7 @@ class AttachmentTestCase(utils.AttachmentTestCase):
         reqdigest = '"{}"'.format(base64.b64encode(digest).decode())
         result = yield from self.attbin.modified(digest)
         self.assert_request_called_with('HEAD', *self.request_path(),
-                                        headers={'IF-NONE-MATCH': reqdigest})
+                                        headers={'If-None-Match': reqdigest})
         self.assertTrue(result)
 
     def test_not_modified(self):
@@ -87,7 +87,7 @@ class AttachmentTestCase(utils.AttachmentTestCase):
             result = yield from self.attbin.modified(digest)
             self.assert_request_called_with(
                 'HEAD', *self.request_path(),
-                headers={'IF-NONE-MATCH': reqdigest})
+                headers={'If-None-Match': reqdigest})
         self.assertFalse(result)
 
     def test_modified_with_base64_digest(self):
@@ -95,7 +95,7 @@ class AttachmentTestCase(utils.AttachmentTestCase):
         reqdigest = '"rL0Y20zC+Fzt72VPzMSk2A=="'
         result = yield from self.attbin.modified(digest)
         self.assert_request_called_with('HEAD', *self.request_path(),
-                                        headers={'IF-NONE-MATCH': reqdigest})
+                                        headers={'If-None-Match': reqdigest})
         self.assertTrue(result)
 
     def test_modified_invalid_digest(self):
@@ -109,7 +109,7 @@ class AttachmentTestCase(utils.AttachmentTestCase):
             yield from self.attbin.modified('bar')
 
     def test_accepts_range(self):
-        with self.response(headers={'ACCEPT-RANGES': 'bytes'}):
+        with self.response(headers={'Accept-Ranges': 'bytes'}):
             result = yield from self.attbin.accepts_range()
             self.assert_request_called_with('HEAD', *self.request_path())
         self.assertTrue(result)
@@ -139,22 +139,22 @@ class AttachmentTestCase(utils.AttachmentTestCase):
     def test_get_range(self):
         yield from self.attbin.get(range=slice(12, 24))
         self.assert_request_called_with('GET', *self.request_path(),
-                                        headers={'RANGE': 'bytes=12-24'})
+                                        headers={'Range': 'bytes=12-24'})
 
     def test_get_range_from_start(self):
         yield from self.attbin.get(range=slice(42))
         self.assert_request_called_with('GET', *self.request_path(),
-                                        headers={'RANGE': 'bytes=0-42'})
+                                        headers={'Range': 'bytes=0-42'})
 
     def test_get_range_iterable(self):
         yield from self.attbin.get(range=[11, 22])
         self.assert_request_called_with('GET', *self.request_path(),
-                                        headers={'RANGE': 'bytes=11-22'})
+                                        headers={'Range': 'bytes=11-22'})
 
     def test_get_range_int(self):
         yield from self.attbin.get(range=42)
         self.assert_request_called_with('GET', *self.request_path(),
-                                        headers={'RANGE': 'bytes=0-42'})
+                                        headers={'Range': 'bytes=0-42'})
 
     def test_get_bad_range(self):
         with self.response(status=416):
@@ -162,14 +162,14 @@ class AttachmentTestCase(utils.AttachmentTestCase):
                 yield from self.attbin.get(range=slice(1024, 8192))
 
         self.assert_request_called_with('GET', *self.request_path(),
-                                        headers={'RANGE': 'bytes=1024-8192'})
+                                        headers={'Range': 'bytes=1024-8192'})
 
     def test_update(self):
         yield from self.attbin.update(io.BytesIO(b''), rev=self.rev)
         self.assert_request_called_with(
             'PUT', *self.request_path(),
             data=Ellipsis,
-            headers={'CONTENT-TYPE': 'application/octet-stream'},
+            headers={'Content-Type': 'application/octet-stream'},
             params={'rev': self.rev})
 
     def test_update_ctype(self):
@@ -179,7 +179,7 @@ class AttachmentTestCase(utils.AttachmentTestCase):
         self.assert_request_called_with(
             'PUT', *self.request_path(),
             data=Ellipsis,
-            headers={'CONTENT-TYPE': 'foo/bar'},
+            headers={'Content-Type': 'foo/bar'},
             params={'rev': self.rev})
 
     def test_update_with_encoding(self):
@@ -189,8 +189,8 @@ class AttachmentTestCase(utils.AttachmentTestCase):
         self.assert_request_called_with(
             'PUT', *self.request_path(),
             data=Ellipsis,
-            headers={'CONTENT-TYPE': 'application/octet-stream',
-                     'CONTENT-ENCODING': 'gzip'},
+            headers={'Content-Type': 'application/octet-stream',
+                     'Content-Encoding': 'gzip'},
             params={'rev': self.rev})
 
     def test_delete(self):
