@@ -114,7 +114,7 @@ class HttpRequestTestCase(utils.TestCase):
     def test_encode_json_body(self):
         req = aiocouchdb.client.HttpRequest('post', self.url,
                                             data={'foo': 'bar'})
-        self.assertEqual(b'{"foo": "bar"}', req.body)
+        self.assertEqual(b'{"foo": "bar"}', req.body._value)
 
     def test_correct_encode_boolean_params(self):
         req = aiocouchdb.client.HttpRequest('get', self.url,
@@ -128,12 +128,12 @@ class HttpRequestTestCase(utils.TestCase):
     def test_encode_chunked_json_body(self):
         req = aiocouchdb.client.HttpRequest(
             'post', self.url, data=('{"foo": "bar"}' for _ in [0]))
-        self.assertIsInstance(req.body, types.GeneratorType)
+        self.assertIsInstance(req.body._value, types.GeneratorType)
 
     def test_encode_readable_object(self):
         req = aiocouchdb.client.HttpRequest(
             'post', self.url, data=io.BytesIO(b'foobarbaz'))
-        self.assertIsInstance(req.body, io.IOBase)
+        self.assertIsInstance(req.body._value, io.IOBase)
 
 
 class HttpResponseTestCase(utils.TestCase):
