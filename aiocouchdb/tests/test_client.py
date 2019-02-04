@@ -119,11 +119,11 @@ class HttpRequestTestCase(utils.TestCase):
     def test_correct_encode_boolean_params(self):
         req = aiocouchdb.client.HttpRequest('get', self.url,
                                             params={'foo': True})
-        self.assertEqual('/?foo=true', req.path)
+        self.assertEqual('/?foo=true', req.url.path_qs)
 
         req = aiocouchdb.client.HttpRequest('get', self.url,
                                             params={'bar': False})
-        self.assertEqual('/?bar=false', req.path)
+        self.assertEqual('/?bar=false', req.url.path_qs)
 
     def test_encode_chunked_json_body(self):
         req = aiocouchdb.client.HttpRequest(

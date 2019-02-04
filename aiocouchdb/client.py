@@ -137,6 +137,20 @@ class HttpRequest(aiohttp.ClientRequest):
     }
     CHUNK_SIZE = 8192
 
+    def __init__(self, *args, **kwargs):
+
+        # Handle boolean parameter initialisation
+        params = kwargs.get('params', None)
+        if params and isinstance(params, dict):
+            print(params)
+            for key, value in params.items():
+                if value is True:
+                    params[key] = 'true'
+                elif value is False:
+                    params[key] = 'false'
+
+        super().__init__(*args, **kwargs)
+
     def update_body_from_data(self, data):
         """Encodes ``data`` as JSON if `Content-Type`
         is :mimetype:`application/json`."""
@@ -151,16 +165,6 @@ class HttpRequest(aiohttp.ClientRequest):
         if isinstance(data, MultipartWriter) and CONTENT_LENGTH in self.headers:
             self.chunked = False
         return rv
-
-    def update_path(self, params):
-        if isinstance(params, dict):
-            params = params.copy()
-            for key, value in params.items():
-                if value is True:
-                    params[key] = 'true'
-                elif value is False:
-                    params[key] = 'false'
-        return super().update_path(params)
 
 
 class HttpResponse(aiohttp.ClientResponse):
