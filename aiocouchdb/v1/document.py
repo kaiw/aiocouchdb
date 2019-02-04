@@ -388,12 +388,12 @@ class Document(object):
                     'follows': True,
                     'content_type': part.headers[CONTENT_TYPE]
                 }
-
-            writer.parts[0].headers[CONTENT_LENGTH] = \
+            first_part = writer._parts[0]
+            first_part[0].headers[CONTENT_LENGTH] = \
                 str(len(json.dumps(doc).encode('utf-8')))
 
             # workaround of COUCHDB-2295
-            writer.headers[CONTENT_LENGTH] = str(writer.calc_content_length())
+            writer.headers[CONTENT_LENGTH] = str(writer.size)
 
             resp = yield from self.resource.put(auth=auth,
                                                 data=writer,
