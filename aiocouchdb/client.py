@@ -135,7 +135,7 @@ class HttpRequest(aiohttp.ClientRequest):
     }
     CHUNK_SIZE = 8192
 
-    def update_body_from_data(self, data, skip_auto_headers):
+    def update_body_from_data(self, data):
         """Encodes ``data`` as JSON if `Content-Type`
         is :mimetype:`application/json`."""
         if data is None:
@@ -145,7 +145,7 @@ class HttpRequest(aiohttp.ClientRequest):
             if not (isinstance(data, non_json_types)):
                 data = json.dumps(data)
 
-        rv = super().update_body_from_data(data, None)
+        rv = super().update_body_from_data(data)
         if isinstance(data, MultipartWriter) and CONTENT_LENGTH in self.headers:
             self.chunked = False
         return rv
