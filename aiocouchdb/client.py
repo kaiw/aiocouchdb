@@ -202,16 +202,14 @@ class HttpResponse(aiohttp.ClientResponse):
 
         return self._body
 
-    @asyncio.coroutine
-    def json(self, *, encoding='utf-8', loads=json.loads):
-        """Reads and decodes JSON response."""
-        if self._body is None:
-            yield from self.read()
+    async def json(self, **kwargs):
+        """Reads and decodes JSON response.
 
-        if not self._body.strip():
-            return None
-
-        return loads(self._body.decode(encoding))
+        This exists solely to default the encoding to UTF-8, to avoid
+        aiohttp's automatic character detection.
+        """
+        kwargs.setdefault('encoding', 'utf-8')
+        return super().json(**kwargs)
 
 
 class HttpSession(object):
