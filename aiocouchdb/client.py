@@ -42,7 +42,7 @@ __all__ = (
 
 
 @asyncio.coroutine
-def request(method, url, *,
+def request(method, str_or_url, *,
             allow_redirects=True,
             compress=None,
             connector=None,
@@ -63,6 +63,8 @@ def request(method, url, *,
     connector = connector or aiohttp.TCPConnector(force_close=True, loop=loop)
     request_class = request_class or HttpRequest
     response_class = response_class or HttpResponse
+
+    url = yarl.URL(str_or_url)
 
     while True:
         req = request_class(method, url,
@@ -255,7 +257,7 @@ class HttpSession(object):
             assert isinstance(value, AuthProvider)
             self._auth = value
 
-    def request(self, method, url, *,
+    def request(self, method, str_or_url, *,
                 allow_redirects=True,
                 auth=None,
                 compress=None,
@@ -273,7 +275,7 @@ class HttpSession(object):
         """Makes a HTTP request with applying authentication routines.
 
         :param str method: Request method
-        :param str url: Requested URL
+        :param str str_or_url: Requested URL
 
         :param bool allow_redirects: Whenever to follow redirects
         :param auth: :class:`aiocouchdb.authn.AuthProvider` instance
@@ -301,6 +303,7 @@ class HttpSession(object):
         params = params or {}
         request_class = request_class or self.request_class
         response_class = response_class or self.response_class
+        url = yarl.URL(str_or_url)
 
         return auth.wrap(request)(method, url,
                                   allow_redirects=allow_redirects,
