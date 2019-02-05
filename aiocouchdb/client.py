@@ -87,7 +87,7 @@ def request(method, str_or_url, *,
                 resp.close()
                 conn.close()
                 raise
-        except (aiohttp.HttpProcessingError,
+        except (aiohttp.http.HttpProcessingError,
                 aiohttp.ServerDisconnectedError) as exc:
             raise aiohttp.ClientResponseError() from exc
         except OSError as exc:
