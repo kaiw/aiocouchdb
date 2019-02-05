@@ -28,7 +28,7 @@ class HttpErrorsTestCase(utils.TestCase):
         yield from aiocouchdb.errors.maybe_raise_error(self.resp)
 
     def test_raise_aiohttp_exception(self):
-        with self.assertRaises(aiohttp.errors.HttpProcessingError):
+        with self.assertRaises(aiohttp.ClientError):
             yield from aiocouchdb.errors.maybe_raise_error(self.resp)
 
     def test_decode_common_error_response(self):
@@ -36,7 +36,7 @@ class HttpErrorsTestCase(utils.TestCase):
             yield from aiocouchdb.errors.maybe_raise_error(self.resp)
         except aiocouchdb.errors.HttpErrorException as exc:
             self.assertEqual('test', exc.error)
-            self.assertEqual('passed', exc.reason)
+            self.assertEqual('passed', exc.message)
         else:
             assert False, 'exception expected'
 

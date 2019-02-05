@@ -15,7 +15,7 @@ Exception hierarchy
 
   BaseException
   +-- Exception
-      +-- aiohttp.errors.HttpProcessingError
+      +-- aiohttp.ClientError
           +-- aiocouchdb.errors.HttpErrorException
               +-- aiocouchdb.errors.BadRequest
               +-- aiocouchdb.errors.Unauthorized
@@ -30,7 +30,7 @@ Exception hierarchy
 
 
 import asyncio
-import aiohttp.errors
+from aiohttp import ClientError
 
 
 __all__ = (
@@ -48,20 +48,18 @@ __all__ = (
 )
 
 
-class HttpErrorException(aiohttp.errors.HttpProcessingError):
-    """Extension of :exc:`aiohttp.errors.HttpErrorException` for CouchDB related
-    errors."""
+class HttpErrorException(ClientError):
+    """Subclass :exc:`aiohttp.ClientError` for CouchDB-specific errors"""
 
     error = ''
-    reason = ''
 
-    def __init__(self, error, reason, headers=None):
+    def __init__(self, error, message, headers=None):
         self.error = error
-        self.reason = reason
+        self.message = message
         self.headers = headers
 
     def __str__(self):
-        return '[{}] {}'.format(self.error or 'unknown_error', self.reason)
+        return '[{}] {}'.format(self.error or 'unknown_error', self.message)
 
 
 class BadRequest(HttpErrorException):
@@ -132,7 +130,7 @@ HTTP_ERROR_BY_CODE = {
 
 @asyncio.coroutine
 def maybe_raise_error(resp):
-    """Raises :exc:`aiohttp.errors.HttpErrorException` exception in case of
+    """Raises :exc:`aiocouchdb.errors.HttpErrorException` exception in case of
     ``>=400`` response status code."""
     if resp.status < 400:
         return
