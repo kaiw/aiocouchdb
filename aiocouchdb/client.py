@@ -80,7 +80,7 @@ def request(method, str_or_url, *,
 
         conn = yield from connector.connect(req)
         try:
-            resp = req.send(conn.writer, conn.reader)
+            resp = req.send(conn)
             try:
                 yield from resp.start(conn, read_until_eof)
             except:
