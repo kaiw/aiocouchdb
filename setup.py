@@ -17,8 +17,8 @@ setup_dir = os.path.dirname(__file__)
 mod = imp.load_module(
     'version', *imp.find_module('version', [join(setup_dir, 'aiocouchdb')]))
 
-if sys.version_info < (3, 3):
-    raise RuntimeError('aiocouchdb requires Python 3.3+')
+if sys.version_info < (3, 5):
+    raise RuntimeError('aiocouchdb requires Python 3.5+')
 
 long_description = ''.join([
     open(join(setup_dir, 'README.rst')).read().strip(),
@@ -51,8 +51,8 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Database :: Front-Ends',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
