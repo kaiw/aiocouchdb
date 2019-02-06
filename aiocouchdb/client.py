@@ -142,7 +142,6 @@ class HttpRequest(aiohttp.ClientRequest):
         # Handle boolean parameter initialisation
         params = kwargs.get('params', None)
         if params and isinstance(params, dict):
-            print(params)
             for key, value in params.items():
                 if value is True:
                     params[key] = 'true'
