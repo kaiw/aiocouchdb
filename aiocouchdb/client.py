@@ -208,7 +208,7 @@ class HttpResponse(aiohttp.ClientResponse):
         aiohttp's automatic character detection.
         """
         kwargs.setdefault('encoding', 'utf-8')
-        return super().json(**kwargs)
+        return await super().json(**kwargs)
 
 
 class HttpSession(object):
