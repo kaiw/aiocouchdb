@@ -183,24 +183,6 @@ class HttpResponse(aiohttp.ClientResponse):
         greater or equal `400`."""
         return maybe_raise_error(self)
 
-    @asyncio.coroutine
-    def read(self):
-        """Read response payload."""
-        if self._body is None:
-            data = bytearray()
-            try:
-                while not self.content.at_eof():
-                    data.extend((yield from self.content.read()))
-            except:
-                self.close()
-                raise
-            else:
-                self.close()
-
-            self._body = data
-
-        return self._body
-
     async def json(self, **kwargs):
         """Reads and decodes JSON response.
 
