@@ -50,6 +50,7 @@ def request(method, str_or_url, *,
             data=None,
             expect100=False,
             headers=None,
+            ssl=None,
             loop=None,
             max_redirects=10,
             params=None,
@@ -73,6 +74,7 @@ def request(method, str_or_url, *,
                             data=data,
                             expect100=expect100,
                             headers=headers,
+                            ssl=ssl,
                             loop=loop,
                             params=params,
                             response_class=response_class,
@@ -201,8 +203,9 @@ class HttpSession(object):
     request_class = HttpRequest
     response_class = HttpResponse
 
-    def __init__(self, *, auth=None, connector=None, loop=None):
+    def __init__(self, *, auth=None, connector=None, loop=None, ssl=None):
         self._auth = auth or NoAuthProvider()
+        self._ssl = ssl or True
 
         if loop is None:
             loop = asyncio.get_event_loop()
@@ -238,6 +241,17 @@ class HttpSession(object):
             assert isinstance(value, AuthProvider)
             self._auth = value
 
+    @property
+    def ssl(self):
+        return self._ssl
+
+    @ssl.setter
+    def ssl(self, value):
+        if value is None:
+            self._ssl = True
+        else:
+            self._ssl = value
+
     def request(self, method, str_or_url, *,
                 allow_redirects=True,
                 auth=None,
@@ -246,6 +260,7 @@ class HttpSession(object):
                 data=None,
                 expect100=False,
                 headers=None,
+                ssl=None,
                 loop=None,
                 max_redirects=10,
                 params=None,
@@ -268,6 +283,7 @@ class HttpSession(object):
                              passed
         :param bool expect100: Whenever HTTP 100 response is expected
         :param dict headers: Request headers
+        :param bool ssl: Whether to verify SSL certificates or SSLContext to pass to aiohttp
         :param loop: AsyncIO event loop instance
         :param int max_redirects: Maximum redirect hops to pass before give up
         :param dict params: Request query parameters
@@ -282,6 +298,7 @@ class HttpSession(object):
         auth = auth or self._auth
         headers = headers or {}
         params = params or {}
+        ssl = ssl or self._ssl
         request_class = request_class or self.request_class
         response_class = response_class or self.response_class
         url = yarl.URL(str_or_url)
@@ -294,6 +311,7 @@ class HttpSession(object):
                                   data=data,
                                   expect100=expect100,
                                   headers=headers,
+                                  ssl=ssl,
                                   loop=loop or self._loop,
                                   max_redirects=max_redirects,
                                   params=params,
