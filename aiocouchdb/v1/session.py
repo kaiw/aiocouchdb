@@ -9,7 +9,7 @@
 
 import asyncio
 
-from aiocouchdb.authn import CookieAuthProvider
+from aiocouchdb.authn import BasicAuthProvider, CookieAuthProvider
 
 
 __all__ = (
@@ -23,6 +23,7 @@ class Session(object):
     """
 
     cookie_auth_provider_class = CookieAuthProvider
+    basic_auth_provider_class = BasicAuthProvider
 
     def __init__(self, resource):
         self.resource = resource('_session')
@@ -44,12 +45,14 @@ class Session(object):
 
         :rtype: :class:`aiocouchdb.authn.CookieAuthProvider`
         """
-        auth = self.cookie_auth_provider_class()
+        basic_auth =  self.basic_auth_provider_class(name=name, password=password)
+        cookie_auth = self.cookie_auth_provider_class()
         doc = {'name': name, 'password': password}
-        resp = yield from self.resource.post(auth=auth, data=doc)
+        resp = yield from self.resource.post(auth=basic_auth, data=doc)
         yield from resp.maybe_raise_error()
         yield from resp.release()
-        return auth
+        cookie_auth.update(resp)
+        return cookie_auth
 
     @asyncio.coroutine
     def info(self, *, auth=None):
