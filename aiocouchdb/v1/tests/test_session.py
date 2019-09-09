@@ -7,6 +7,8 @@
 # you should have received as part of this distribution.
 #
 
+import base64
+
 import aiocouchdb.authn
 
 from . import utils
@@ -19,9 +21,17 @@ class SessionTestCase(utils.ServerTestCase):
         with self.response(data=b'{"ok": true}',
                            cookies={'AuthSession': 's3cr1t'}):
             auth = yield from self.server.session.open('root', 'relax')
-            self.assert_request_called_with('POST', '_session',
-                                            data={'name': 'root',
-                                                  'password': 'relax'})
+            basic_token = base64.b64encode(b'root:relax').decode('ascii')
+            self.assert_request_called_with(
+                'POST', '_session',
+                headers={
+                    'Authorization': 'Basic ' + basic_token,
+                },
+                data={
+                    'name': 'root',
+                    'password': 'relax',
+                }
+            )
         self.assertIsInstance(auth, aiocouchdb.authn.CookieAuthProvider)
         self.assertIn('AuthSession', auth._cookies)
 
