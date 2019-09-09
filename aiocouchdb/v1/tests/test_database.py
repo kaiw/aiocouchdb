@@ -376,7 +376,7 @@ class DatabaseTestCase(utils.DatabaseTestCase):
     def test_document_docid_gen_fun_default_uuid(self):
         result = yield from self.db.doc()
         call_args, _ = self.request.call_args
-        docid = call_args[-1].rsplit('/', 1)[-1]
+        docid = str(call_args[-1]).rsplit('/', 1)[-1]
         self.assertRegex(docid, '[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}')
         self.assert_request_called_with('HEAD', self.db.name, docid)
         self.assertIsInstance(result, self.db.document_class)
