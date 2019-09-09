@@ -131,26 +131,15 @@ class DatabaseTestCase(utils.DatabaseTestCase):
         self.assert_request_called_with('POST', self.db.name, '_bulk_docs',
                                         data=Ellipsis)
         data = self.request.call_args[1]['data']
-        self.assertIsInstance(data, types.GeneratorType)
-        if self._test_target == 'mock':
-            # while aiohttp.request is mocked, the payload generator
-            # doesn't get used so we can check the real payload data.
-            self.assertEqual(b'{"docs": [{"_id": "foo"},{"_id": "bar"}]}',
-                             b''.join(data))
 
-    def test_bulk_docs_all_or_nothing(self):
-        yield from self.db.bulk_docs([{'_id': 'foo'}, {'_id': 'bar'}],
-                                     all_or_nothing=True)
-        self.assert_request_called_with('POST', self.db.name, '_bulk_docs',
-                                        data=Ellipsis)
-        data = self.request.call_args[1]['data']
-        self.assertIsInstance(data, types.GeneratorType)
         if self._test_target == 'mock':
             # while aiohttp.request is mocked, the payload generator
             # doesn't get used so we can check the real payload data.
-            self.assertEqual(b'{"all_or_nothing": true, "docs": '
-                             b'[{"_id": "foo"},{"_id": "bar"}]}',
-                             b''.join(data))
+            self.assertEqual({
+                'new_edits': True,
+                'all_or_nothing': False,
+                'docs': [{"_id": "foo"}, {"_id": "bar"}]
+            }, data)
 
     def test_bulk_docs_new_edits(self):
         yield from self.db.bulk_docs([{'_rev': '1-foo'}], new_edits=False)

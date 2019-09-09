@@ -256,8 +256,8 @@ class Database(object):
                                         params=params))
 
     @asyncio.coroutine
-    def bulk_docs(self, docs, *, auth=None, all_or_nothing=None,
-                  new_edits=None):
+    def bulk_docs(self, docs, *, auth=None, all_or_nothing=False,
+                  new_edits=True):
         """:ref:`Updates multiple documents <api/db/bulk_docs>` using a single
         request.
 
@@ -270,24 +270,13 @@ class Database(object):
 
         :rtype: list
         """
-        def chunkify(docs, all_or_nothing, new_edits):
-            # stream docs one by one to reduce footprint from jsonifying all
-            # of them in single shot. useful when docs is generator of docs
-            first_chunk = b'{'
-            if all_or_nothing is True:
-                first_chunk += b'"all_or_nothing": true, '
-            if new_edits is False:
-                first_chunk += b'"new_edits": false, '
-            first_chunk += b'"docs": ['
-            yield first_chunk
-            idocs = iter(docs)
-            yield json.dumps(next(idocs)).encode('utf-8')
-            for doc in idocs:
-                yield b',' + json.dumps(doc).encode('utf-8')
-            yield b']}'
-        chunks = chunkify(docs, all_or_nothing, new_edits)
         resp = yield from self.resource.post(
-            '_bulk_docs', auth=auth, data=chunks)
+            '_bulk_docs', auth=auth, data={
+                'new_edits': new_edits,
+                'all_or_nothing': all_or_nothing,
+                'docs': docs,
+            }
+        )
         yield from resp.maybe_raise_error()
         return (yield from resp.json())
 
