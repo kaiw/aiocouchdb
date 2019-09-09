@@ -184,7 +184,9 @@ class TestCase(unittest.TestCase, metaclass=MetaAioTestCase):
             call_args, call_kwargs = self._req_per_task[current_task][-1]
         else:
             call_args, call_kwargs = self.request.call_args
-        self.assertEqual((method, urljoin(self.url, *path)), call_args)
+
+        expected_url = URL(urljoin(self.url, *path))
+        self.assertEqual((method, expected_url), call_args)
 
         kwargs.setdefault('data', None)
         kwargs.setdefault('headers', {})
