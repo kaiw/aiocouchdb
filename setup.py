@@ -62,7 +62,7 @@ setup(
     zip_safe=False,
 
     install_requires=[
-        'aiohttp>=3.0',
+        'aiohttp~=3.0',
         'multidict>=4.0,<5.0',
     ],
     extras_require={
