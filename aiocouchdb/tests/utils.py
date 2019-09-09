@@ -20,6 +20,7 @@ import uuid as _uuid
 from collections import deque, defaultdict
 
 from aiohttp.helpers import TimerNoop
+from multidict import CIMultiDict
 from yarl import URL
 
 import aiocouchdb.client
@@ -119,7 +120,8 @@ class TestCase(unittest.TestCase, metaclass=MetaAioTestCase):
                     fut.set_result(b'')
                 return fut
             return side_effect
-        headers = headers or {}
+
+        headers = CIMultiDict(headers or {})
         headers.setdefault('CONTENT-TYPE', 'application/json')
         cookies = cookies or {}
 
